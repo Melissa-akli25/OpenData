@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulation Virale — Université</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Initialisation A* + 1000 étudiants…</p>
+    </div>
+  </div>
+  <header id="header">
+    <div class="header-left">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="4" fill="currentColor" opacity="0.6"/>
+          <line x1="12" y1="2" x2="12" y2="8" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="12" y1="16" x2="12" y2="22" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="2" y1="12" x2="8" y2="12" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="16" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h1>Propagation Virale — Simulation Universitaire</h1>
+      <div class="time-badge" id="time-display-header">07:00</div>
+    </div>
+    <div class="header-right">
+      <div class="stat-chip"><span class="stat-dot healthy"></span><span class="stat-label">Sains</span><span class="stat-value" id="count-healthy">0</span></div>
+      <div class="stat-chip"><span class="stat-dot exposed"></span><span class="stat-label">Incubation</span><span class="stat-value" id="count-exposed">0</span></div>
+      <div class="stat-chip"><span class="stat-dot infected"></span><span class="stat-label">Infectés</span><span class="stat-value" id="count-infected">0</span></div>
+      <div class="stat-chip"><span class="stat-dot active-dot"></span><span class="stat-label">Présents</span><span class="stat-value" id="count-active">0</span></div>
+      <div class="stat-chip"><span class="stat-dot contacts"></span><span class="stat-label">Contacts</span><span class="stat-value" id="count-contacts">0</span></div>
+    </div>
+  </header>
+  <main id="main-content">
+    <aside id="control-panel">
+      <div class="panel-section">
+        <h2 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Horloge Simulée
+        </h2>
+        <div class="time-display" id="time-display">07:00</div>
+        <div class="control-group">
+          <label for="time-slider">Heure de la journée</label>
+          <input type="range" id="time-slider" min="0" max="720" value="0" step="1">
+          <div class="range-labels"><span>7h00</span><span>13h00</span><span>19h00</span></div>
+        </div>
+        <div class="control-group">
+          <label for="speed-slider">Vitesse : <span id="speed-label">1x</span></label>
+          <input type="range" id="speed-slider" min="0.5" max="10" value="1" step="0.5">
+          <div class="range-labels"><span>0.5x</span><span>5x</span><span>10x</span></div>
+        </div>
+        <div class="button-row">
+          <button id="btn-play" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="4,2 14,8 4,14"/></svg>
+            <span>Lecture</span>
+          </button>
+          <button id="btn-pause" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>
+            <span>Pause</span>
+          </button>
+        </div>
+        <div class="button-row-single">
+          <button id="btn-reset" class="btn btn-danger">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 1 1.5 4" stroke-linecap="round"/><path d="M2 12V8h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h2 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v5M5 8H1M15 8h-4M8 11v5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Paramètres du Virus
+        </h2>
+        <div class="control-group">
+          <label for="transmission-slider">Probabilité de transmission : <span id="transmission-label">0.30</span></label>
+          <input type="range" id="transmission-slider" min="0" max="1" value="0.30" step="0.01">
+          <div class="range-labels"><span>0.0</span><span>0.5</span><span>1.0</span></div>
+        </div>
+        <div class="control-group">
+          <label for="proximity-slider">Seuil de proximité : <span id="proximity-label">1.5</span> m</label>
+          <input type="range" id="proximity-slider" min="0.5" max="5.0" value="1.5" step="0.5">
+          <div class="range-labels"><span>0.5m</span><span>2.5m</span><span>5m</span></div>
+        </div>
+        <div class="control-group">
+          <label for="incubation-slider">Durée d'incubation : <span id="incubation-label">2</span> h</label>
+          <input type="range" id="incubation-slider" min="1" max="6" value="2" step="0.5">
+          <div class="range-labels"><span>1h</span><span>3.5h</span><span>6h</span></div>
+        </div>
+        <div class="control-group">
+          <label for="patient-zero-slider">Patients zéro : <span id="patient-zero-label">3</span></label>
+          <input type="range" id="patient-zero-slider" min="1" max="20" value="3" step="1">
+          <div class="range-labels"><span>1</span><span>10</span><span>20</span></div>
+        </div>
+        <div class="zone-info">
+          <p class="zone-title">Zone × transmission :</p>
+          <div class="zone-row"><span class="zone-dot classroom-zone"></span> Classe ×0.8</div>
+          <div class="zone-row"><span class="zone-dot corridor-zone"></span> Couloir ×0.5</div>
+          <div class="zone-row"><span class="zone-dot cafeteria-zone"></span> Cafétéria ×1.2</div>
+          <div class="zone-row"><span class="zone-dot exterior-zone"></span> Extérieur ×0</div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h2 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><circle cx="11" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3 2-4 5-4s5 1 5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Population Simulée
+        </h2>
+        <div class="control-group">
+          <label for="population-slider">Étudiants actifs : <span id="population-label">80</span></label>
+          <input type="range" id="population-slider" min="20" max="250" value="80" step="5">
+          <div class="range-labels"><span>20</span><span>135</span><span>250</span></div>
+          <p class="control-hint">Sélectionne aléatoirement parmi les 1000 étudiants du CSV. Modifie la valeur puis relâche pour redémarrer.</p>
+        </div>
+        <button id="btn-export" class="btn btn-export">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M5 7l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="11" width="12" height="3" rx="1" fill="currentColor" opacity="0.2"/><path d="M2 12h12" stroke-linecap="round"/></svg>
+          <span>Télécharger CSV instantané</span>
+        </button>
+      </div>
+
+      <div class="panel-section panel-legend">
+        <h2 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Légende SEIR
+        </h2>
+        <div class="legend-items">
+          <div class="legend-item"><span class="legend-dot" style="background:var(--color-healthy)"></span> Sain</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--color-exposed)"></span> Exposé (incubation)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--color-infected)"></span> Infecté (contagieux)</div>
+          <div class="legend-item"><span class="legend-line"></span> Contact &le; 1m</div>
+          <div class="legend-item"><span class="legend-room classroom-color"></span> Salle de classe</div>
+          <div class="legend-item"><span class="legend-room cafeteria-color"></span> Cafétéria</div>
+          <div class="legend-item"><span class="legend-room exterior-color"></span> Cour / Extérieur</div>
+        </div>
+      </div>
+    </aside>
+    <div id="viz-area">
+      <div class="viz-panel" id="spatial-panel">
+        <div class="viz-header">
+          <h2>Vue Spatiale — Plan de l'Université (A* &bull; 1000 étudiants)</h2>
+          <span class="badge">2D Top-Down</span>
+        </div>
+        <div class="canvas-wrapper" id="spatial-wrapper">
+          <canvas id="spatial-canvas"></canvas>
+        </div>
+      </div>
+      <div class="viz-panel" id="graph-panel">
+        <div class="viz-header">
+          <h2>Graphe d'Interactions — Réseau de Contacts</h2>
+          <span class="badge">Théorie des Graphes</span>
+        </div>
+        <div class="canvas-wrapper" id="graph-wrapper">
+          <canvas id="graph-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/students_data.js"></script>
+<script src="js/config.js"></script>
+<script src="js/map.js"></script>
+<script src="js/pathfinding.js"></script>
+<script src="js/agent.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
